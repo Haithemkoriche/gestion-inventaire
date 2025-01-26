@@ -17,8 +17,8 @@ return new class extends Migration
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
-            $table->unsignedBigInteger('siege_id');
-            $table->foreign('siege_id')->references('id')->on('sieges')->onDelete('cascade')->onUpdate('cascade');
+            // $table->unsignedBigInteger('siege_id');
+            // $table->foreign('siege_id')->references('id')->on('sieges')->onDelete('cascade')->onUpdate('cascade');
 
             $table->rememberToken();
             $table->timestamps();
