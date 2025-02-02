@@ -21,7 +21,7 @@
                 </div>
             </div>
         </div>
-        <div class="col-sm-12 col-md-3">
+        {{-- <div class="col-sm-12 col-md-3">
             <div class="card text-bg-success mb-3" style="max-width: 18rem;">
                 <div class="card-header">Besoin</div>
                 <div class="card-body">
@@ -29,7 +29,7 @@
                     <p class="card-text"><a href="{{route('bureaux.index')}}" class="btn btn-light">Ajouter</a></p>
                 </div>
             </div>
-        </div>
+        </div> --}}
         {{-- <div class="col-sm-12 col-md-3">
                 <div class="card text-bg-warning mb-3" style="max-width: 18rem;">
                     <div class="card-header">Siége</div>
