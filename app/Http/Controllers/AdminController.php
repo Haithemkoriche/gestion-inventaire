@@ -53,7 +53,7 @@ class AdminController extends Controller
     {
         // $user = Auth::user();
         // $userSiegeId = $user->siege_id;
-        // Get the bureaux with matching siege  
+        // Get the bureaux with matching siege
         $bureaux = Office::all();
         // $bureaux = Office::with('sieges')->get();
         // $sieges = Siege::all();
@@ -99,18 +99,107 @@ class AdminController extends Controller
         $user = User::findOrFail($id);
         $user->delete();
         return redirect()->route('admin.users.index')->with('success', 'Utilisateur supprimé avec succès');
-
     }
-public function showstock(){
-  
- $articles=Article::all();  
- $stockStatus = [];
- foreach ($articles as $article) {
-     $stock = $article->stock;
-     $stockStatus[$article->id] = $stock ? $stock->status : null;
- }
- $totalArticles = $articles->count();
+    private $wilayas = [
+        'Adrar',
+        'Chlef',
+        'Laghouat',
+        'Oum El Bouaghi',
+        'Batna',
+        'Béjaïa',
+        'Biskra',
+        'Béchar',
+        'Blida',
+        'Bouira',
+        'Tamanrasset',
+        'Tébessa',
+        'Tlemcen',
+        'Tiaret',
+        'Tizi Ouzou',
+        'Alger',
+        'Djelfa',
+        'Jijel',
+        'Sétif',
+        'Saïda',
+        'Skikda',
+        'Sidi Bel Abbès',
+        'Annaba',
+        'Guelma',
+        'Constantine',
+        'Médéa',
+        'Mostaganem',
+        'M\'Sila',
+        'Mascara',
+        'Ouargla',
+        'Oran',
+        'El Bayadh',
+        'Illizi',
+        'Bordj Bou Arréridj',
+        'Boumerdès',
+        'El Tarf',
+        'Tindouf',
+        'Tissemsilt',
+        'El Oued',
+        'Khenchela',
+        'Souk Ahras',
+        'Tipaza',
+        'Mila',
+        'Aïn Defla',
+        'Naâma',
+        'Aïn Témouchent',
+        'Ghardaïa',
+        'Relizane',
+        'Timimoun',
+        'Bordj Badji Mokhtar',
+        'Ouled Djellal',
+        'Béni Abbès',
+        'In Salah',
+        'In Guezzam',
+        'Touggourt',
+        'Djanet',
+        'El M\'Ghair',
+        'El Meniaa'
+    ];
+    public function showstock()
+    {
+        // Get current wilaya filter and search term
+        $selectedWilaya = request('wilaya');
+        $searchTerm = request('search');
 
-    return view('admin.stock', compact('articles', 'stockStatus', 'totalArticles'));
-}
+        // Start with a base query
+        $query = Article::with([
+            'offices' => function ($query) {
+                $query->with('sieges:id,designation,wilaya_sieges');
+            },
+            'stock'
+        ]);
+
+        // Apply search filter if search term exists
+        if ($searchTerm) {
+            $query->where('designation', 'LIKE', '%' . $searchTerm . '%');
+        }
+
+        // Apply wilaya filter at the query level if selected
+        if ($selectedWilaya) {
+            $query->whereHas('offices.sieges', function ($query) use ($selectedWilaya) {
+                $query->where('wilaya_sieges', $selectedWilaya);
+            });
+        }
+
+        // Execute the query
+        $articles = $query->get();
+
+        // Process stock status
+        $stockStatus = $articles->mapWithKeys(function ($article) {
+            return [$article->id => $article->stock ? $article->stock->status : null];
+        })->all();
+
+        $totalArticles = $articles->count();
+
+        // Pass both the search term and selected wilaya back to the view
+        return view('admin.stock', compact('articles', 'stockStatus', 'totalArticles'))
+            ->with('wilayas', $this->wilayas)
+            ->with('search', $searchTerm)
+            ->with('selectedWilaya', $selectedWilaya);
+    }
 }

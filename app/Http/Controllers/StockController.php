@@ -15,11 +15,11 @@ class StockController extends Controller
     $user = Auth::user();
 
     $userSiegeId = $user->siege_id;
-  
+
     $userOffices = Office::whereHas('sieges', function($q) use ($userSiegeId){
-        $q->where('sieges.id', $userSiegeId);  
+        $q->where('sieges.id', $userSiegeId);
     })->pluck('offices.id');
-                 
+
     $articles = Article::whereHas('offices', function($q) use ($userOffices) {
         $q->whereIn('offices.id', $userOffices);
     })->get();
@@ -33,7 +33,7 @@ class StockController extends Controller
         $stock = $article->stock;
         $stockStatus[$article->id] = $stock ? $stock->status : null;
     }
-  
+
     // Pass the total articles count to the view as well
     return view('stockes.index', compact('articles', 'stockStatus', 'totalArticles'));
 }
